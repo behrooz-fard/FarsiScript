@@ -1,13 +1,13 @@
 from distutils.core import setup
 
 setup(
-    name='pyjsparser',
-    version='2.5.0',
-    packages=['pyjsparser'],
-    url='https://github.com/PiotrDabkowski/pyjsparser',
+    name='farsiscript',
+    version='0.0.1',
+    packages=['farsiscript'],
+    url='https://github.com/behrooz-fard/pyjsparser',
     install_requires = [],
     license='MIT',
-    author='Piotr Dabkowski',
-    author_email='piodrus@gmail.com',
-    description='Fast javascript parser (based on esprima.js)'
+    author='Behrooz Fard',
+    author_email='behrooz.fard@gmail.com',
+    description='a JavaScript dialect in Farsi (based on PyJsParser https://github.com/PiotrDabkowski/pyjsparser)'
 )

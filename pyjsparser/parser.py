@@ -18,7 +18,7 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 #  OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 from __future__ import unicode_literals
-from .pyjsparserdata import *
+from .fsparserdata import *
 from .std_nodes import *
 from pprint import pprint
 import sys
@@ -94,16 +94,9 @@ class PyJsParser:
                 self.lineNumber += 1
                 self.hasLineTerminator = True
                 self.lineStart = self.index
-                return {
-                    'type': 'Line',
-                    'value': self.source[start + offset:self.index-2],
-                    'leading': True,
-                    'trailing': False,
-                    'loc': None,
-                }
+                return
 
     def skipMultiLineComment(self):
-        start = self.index
         while self.index < self.length:
             ch = ord(self.source[self.index])
             if isLineTerminator(ch):
@@ -117,13 +110,7 @@ class PyJsParser:
                 # Block comment ends with '*/'.
                 if ord(self.source[self.index + 1]) == 0x2F:
                     self.index += 2
-                    return {
-                        'type': 'Block',
-                        'value': self.source[start:self.index-2],
-                        'leading': True,
-                        'trailing': False,
-                        'loc': None,
-                    }
+                    return
                 self.index += 1
             else:
                 self.index += 1
@@ -131,9 +118,7 @@ class PyJsParser:
 
     def skipComment(self):
         self.hasLineTerminator = False
-        startIndex = self.index
         start = (self.index == 0)
-        comments = []
         while self.index < self.length:
             ch = ord(self.source[self.index])
             if isWhiteSpace(ch):
@@ -150,11 +135,11 @@ class PyJsParser:
                 ch = ord(self.source[self.index + 1])
                 if (ch == 0x2F):
                     self.index += 2
-                    comments.append(self.skipSingleLineComment(2))
+                    self.skipSingleLineComment(2)
                     start = True
                 elif (ch == 0x2A):  # U+002A is '*'
                     self.index += 2
-                    comments.append(self.skipMultiLineComment())
+                    self.skipMultiLineComment()
                 else:
                     break
             elif (start and ch == 0x2D):  # U+002D is '-'
@@ -174,7 +159,6 @@ class PyJsParser:
                     break
             else:
                 break
-        return filter(None, comments)
 
     def scanHexEscape(self, prefix):
         code = 0
@@ -844,10 +828,10 @@ class PyJsParser:
             'value': flags,
             'literal': st}
 
-    def scanRegExp(self, comments):
+    def scanRegExp(self):
         self.scanning = True
         self.lookahead = None
-        comments.extend(self.skipComment())
+        self.skipComment()
         start = self.index
 
         body = self.scanRegExpBody()
@@ -862,21 +846,16 @@ class PyJsParser:
                 'flags': flags['value']
             },
             'start': start,
-            'end': self.index,
-            'comments': comments}
+            'end': self.index}
 
     def collectRegex(self):
-        return self.scanRegExp(self.skipComment())
+        self.skipComment();
+        return self.scanRegExp()
 
     def isIdentifierName(self, token):
         return token['type'] in (1, 3, 4, 5)
 
     # def advanceSlash(self): ???
-
-    def advanceWithComments(self, comments):
-        token = self.advance()
-        token['comments'] = comments
-        return token
 
     def advance(self):
         if (self.index >= self.length):
@@ -954,7 +933,7 @@ class PyJsParser:
         self.lastLineNumber = self.lineNumber
         self.lastLineStart = self.lineStart
 
-        comments = self.skipComment()
+        self.skipComment()
 
         token = self.lookahead
 
@@ -962,14 +941,14 @@ class PyJsParser:
         self.startLineNumber = self.lineNumber
         self.startLineStart = self.lineStart
 
-        self.lookahead = self.advanceWithComments(comments)
+        self.lookahead = self.advance()
         self.scanning = False
         return token
 
     def peek(self):
         self.scanning = True
 
-        comments = self.skipComment()
+        self.skipComment()
 
         self.lastIndex = self.index
         self.lastLineNumber = self.lineNumber
@@ -979,14 +958,18 @@ class PyJsParser:
         self.startLineNumber = self.lineNumber
         self.startLineStart = self.lineStart
 
-        self.lookahead = self.advanceWithComments(comments)
+        self.lookahead = self.advance()
         self.scanning = False
 
     def createError(self, line, pos, description):
         global ENABLE_PYIMPORT
         msg = 'Line ' + unicode(line) + ': ' + unicode(description)
         if ENABLE_JS2PY_ERRORS:
-            return ENABLE_JS2PY_ERRORS(msg)
+            if isinstance(ENABLE_JS2PY_ERRORS, bool):
+                import js2py.base
+                return js2py.base.MakeError('SyntaxError', msg)
+            else:
+                return ENABLE_JS2PY_ERRORS(msg)
         else:
             return JsSyntaxError(msg)
 
@@ -1090,7 +1073,6 @@ class PyJsParser:
 
     def consumeSemicolon(self):
         # Catch the very common case first: immediately a semicolon (U+003B).
-
         if (self.at(self.startIndex) == ';' or self.match(';')):
             self.lex()
             return
@@ -1383,7 +1365,6 @@ class PyJsParser:
     def parseObjectProperty(self, hasProto):
         token = self.lookahead
         node = Node()
-        node.comments = self.lookahead.get('comments', [])
 
         computed = self.match('[');
         key = self.parseObjectPropertyKey();
@@ -1415,8 +1396,9 @@ class PyJsParser:
         properties = []
         hasProto = {'value': false}
         node = Node();
-        node.comments = self.lookahead.get('comments', [])
+
         self.expect('{');
+
         while (not self.match('}')):
             properties.append(self.parseObjectProperty(hasProto));
 
@@ -1552,7 +1534,6 @@ class PyJsParser:
 
         typ = self.lookahead['type']
         node = Node();
-        node.comments = self.lookahead.get('comments', [])
 
         if (typ == Token.Identifier):
             expr = node.finishIdentifier(self.lex()['value']);
@@ -1563,7 +1544,7 @@ class PyJsParser:
             expr = node.finishLiteral(self.lex())
         elif (typ == Token.Keyword):
             self.isAssignmentTarget = self.isBindingElement = false
-            if (self.matchKeyword('function')):
+            if (self.matchKeyword('tabe')):
                 return self.parseFunctionExpression()
             if (self.matchKeyword('this')):
                 self.lex()
@@ -1584,7 +1565,7 @@ class PyJsParser:
         elif (self.match('/') or self.match('/=')):
             self.isAssignmentTarget = self.isBindingElement = false;
             self.index = self.startIndex;
-            token = self.scanRegExp([]);  # hehe, here you are!
+            token = self.scanRegExp();  # hehe, here you are!
             self.lex();
             expr = node.finishLiteral(token);
         elif (typ == Token.Template):
@@ -1773,7 +1754,7 @@ class PyJsParser:
         if (typ != Token.Punctuator and typ != Token.Keyword):
             return 0;
         val = token['value']
-        if val == 'in' and not allowIn:
+        if val == 'dar' and not allowIn:
             return 0
         return PRECEDENCE.get(val, 0)
 
@@ -1950,7 +1931,7 @@ class PyJsParser:
             return expr
 
         if (self.matchAssign()):
-            if (not self.isAssignmentTarget):
+            if (not self.isAssignmentTarget or expr.type==Syntax.Literal):
                 self.tolerateError(Messages.InvalidLHSInAssignment)
             # 11.13.1
 
@@ -1998,7 +1979,7 @@ class PyJsParser:
                 return self.parseImportDeclaration();
             elif val == 'const' or val == 'let':
                 return self.parseLexicalDeclaration({'inFor': false});
-            elif val == 'function':
+            elif val == 'tabe':
                 return self.parseFunctionDeclaration(Node());
             elif val == 'class':
                 return self.parseClassDeclaration();
@@ -2051,6 +2032,7 @@ class PyJsParser:
     def parseVariableDeclaration(self):
         init = null
         node = Node();
+
         d = self.parsePattern();
 
         # 12.2.1
@@ -2078,7 +2060,8 @@ class PyJsParser:
         return lis;
 
     def parseVariableStatement(self, node):
-        self.expectKeyword('var')
+        self.expectKeyword('motaghayer')
+
         declarations = self.parseVariableDeclarationList()
 
         self.consumeSemicolon()
@@ -2096,7 +2079,7 @@ class PyJsParser:
             self.tolerateError(Messages.StrictVarName);
 
         if (kind == 'const'):
-            if (not self.matchKeyword('in')):
+            if (not self.matchKeyword('dar')):
                 self.expect('=')
                 init = self.isolateCoverGrammar(self.parseAssignmentExpression)
         elif ((not options['inFor'] and d.type != Syntax.Identifier) or self.match('=')):
@@ -2156,7 +2139,7 @@ class PyJsParser:
     # 12.5 If statement
 
     def parseIfStatement(self, node):
-        self.expectKeyword('if');
+        self.expectKeyword('agar');
 
         self.expect('(');
 
@@ -2166,7 +2149,7 @@ class PyJsParser:
 
         consequent = self.parseStatement();
 
-        if (self.matchKeyword('else')):
+        if (self.matchKeyword('varna')):
             self.lex();
             alternate = self.parseStatement();
         else:
@@ -2177,7 +2160,7 @@ class PyJsParser:
 
     def parseDoWhileStatement(self, node):
 
-        self.expectKeyword('do')
+        self.expectKeyword('anjambede')
 
         oldInIteration = self.state['inIteration']
         self.state['inIteration'] = true
@@ -2186,7 +2169,7 @@ class PyJsParser:
 
         self.state['inIteration'] = oldInIteration;
 
-        self.expectKeyword('while');
+        self.expectKeyword('tavaghti');
 
         self.expect('(');
 
@@ -2200,7 +2183,7 @@ class PyJsParser:
 
     def parseWhileStatement(self, node):
 
-        self.expectKeyword('while')
+        self.expectKeyword('tavaghti')
 
         self.expect('(')
 
@@ -2222,14 +2205,14 @@ class PyJsParser:
 
         init = test = update = null
 
-        self.expectKeyword('for')
+        self.expectKeyword('baraye')
 
         self.expect('(')
 
         if (self.match(';')):
             self.lex()
         else:
-            if (self.matchKeyword('var')):
+            if (self.matchKeyword('motaghayer')):
                 init = Node()
                 self.lex()
 
@@ -2237,7 +2220,7 @@ class PyJsParser:
                 init = init.finishVariableDeclaration(self.parseVariableDeclarationList())
                 self.state['allowIn'] = previousAllowIn
 
-                if (len(init.declarations) == 1 and self.matchKeyword('in')):
+                if (len(init.declarations) == 1 and self.matchKeyword('dar')):
                     self.lex()
                     left = init
                     right = self.parseExpression()
@@ -2252,7 +2235,7 @@ class PyJsParser:
                 declarations = self.parseBindingList(kind, {'inFor': true})
                 self.state['allowIn'] = previousAllowIn
 
-                if (len(declarations) == 1 and declarations[0].init == null and self.matchKeyword('in')):
+                if (len(declarations) == 1 and declarations[0].init == null and self.matchKeyword('dar')):
                     init = init.finishLexicalDeclaration(declarations, kind);
                     self.lex();
                     left = init;
@@ -2267,7 +2250,7 @@ class PyJsParser:
                 init = self.inheritCoverGrammar(self.parseAssignmentExpression);
                 self.state['allowIn'] = previousAllowIn;
 
-                if (self.matchKeyword('in')):
+                if (self.matchKeyword('dar')):
                     if (not self.isAssignmentTarget):
                         self.tolerateError(Messages.InvalidLHSInForIn)
                     self.lex();
@@ -2310,7 +2293,7 @@ class PyJsParser:
     def parseContinueStatement(self, node):
         label = null
 
-        self.expectKeyword('continue');
+        self.expectKeyword('edame');
 
         # Optimize the most common form: 'continue;'.
         if ord(self.source[self.startIndex]) == 0x3B:
@@ -2340,7 +2323,7 @@ class PyJsParser:
     def parseBreakStatement(self, node):
         label = null
 
-        self.expectKeyword('break');
+        self.expectKeyword('bebor');
 
         # Catch the very common case first: immediately a semicolon (U+003B).
         if (ord(self.source[self.lastIndex]) == 0x3B):
@@ -2547,7 +2530,6 @@ class PyJsParser:
 
         self.isAssignmentTarget = self.isBindingElement = true;
         node = Node();
-        node.comments = self.lookahead.get('comments', [])
         val = self.lookahead['value']
 
         if (typ == Token.Punctuator):
@@ -2556,19 +2538,19 @@ class PyJsParser:
             elif val == '(':
                 return self.parseExpressionStatement(node);
         elif (typ == Token.Keyword):
-            if val == 'break':
+            if val == 'bebor':
                 return self.parseBreakStatement(node);
-            elif val == 'continue':
+            elif val == 'edame':
                 return self.parseContinueStatement(node);
             elif val == 'debugger':
                 return self.parseDebuggerStatement(node);
-            elif val == 'do':
+            elif val == 'anjambede':
                 return self.parseDoWhileStatement(node);
-            elif val == 'for':
+            elif val == 'baraye':
                 return self.parseForStatement(node);
-            elif val == 'function':
+            elif val == 'tabe':
                 return self.parseFunctionDeclaration(node);
-            elif val == 'if':
+            elif val == 'agar':
                 return self.parseIfStatement(node);
             elif val == 'return':
                 return self.parseReturnStatement(node);
@@ -2578,9 +2560,9 @@ class PyJsParser:
                 return self.parseThrowStatement(node);
             elif val == 'try':
                 return self.parseTryStatement(node);
-            elif val == 'var':
+            elif val == 'motaghayer':
                 return self.parseVariableStatement(node);
-            elif val == 'while':
+            elif val == 'tavaghti':
                 return self.parseWhileStatement(node);
             elif val == 'with':
                 return self.parseWithStatement(node);
@@ -2724,14 +2706,13 @@ class PyJsParser:
             'message': options.get('message')}
 
     def parseFunctionDeclaration(self, node, identifierIsOptional=None):
-        node.comments = self.lookahead.get('comments', [])
         d = null
         params = []
         defaults = []
         message = None
         firstRestricted = None
 
-        self.expectKeyword('function');
+        self.expectKeyword('tabe');
         if (identifierIsOptional or not self.match('(')):
             token = self.lookahead;
             d = self.parseVariableIdentifier();
@@ -2770,11 +2751,10 @@ class PyJsParser:
         params = []
         defaults = []
         node = Node();
-        node.comments = self.lookahead.get('comments', [])
         firstRestricted = None
         message = None
 
-        self.expectKeyword('function');
+        self.expectKeyword('tabe');
 
         if (not self.match('(')):
             token = self.lookahead;
@@ -2900,7 +2880,7 @@ if __name__ == '__main__':
         x = f.read()
         f.close()
     else:
-        x = 'var $ = "Hello!"'
+        x = 'motaghayer $ = "Hello!"'
     p = PyJsParser()
     t = time.time()
     res = p.parse(x)

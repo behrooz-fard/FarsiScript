@@ -46,7 +46,7 @@ token = {
 
 TokenName = dict((v,k) for k,v in token.items())
 
-FnExprTokens = ['(', '{', '[', 'in', 'typeof', 'instanceof', 'new',
+FnExprTokens = ['(', '{', '[', 'dar', 'typeof', 'instanceof', 'new',
                     'return', 'case', 'delete', 'throw', 'void',
                     # assignment operators
                     '=', '+=', '-=', '*=', '/=', '%=', '<<=', '>>=', '>>>=',
@@ -181,7 +181,7 @@ PRECEDENCE = {'||':1,
              '<=':7,
              '>=':7,
              'instanceof':7,
-             'in':7,
+             'dar':7,
              '<<':8,
              '>>':8,
              '>>>':8,
@@ -282,10 +282,10 @@ def isRestrictedWord(w):
     return w in  ('eval', 'arguments')
 
 
-KEYWORDS = set(('if', 'in', 'do', 'var', 'for', 'new', 'try', 'let', 'this', 'else', 'case',
-                     'void', 'with', 'enum', 'while', 'break', 'catch', 'throw', 'const', 'yield',
+KEYWORDS = set(('agar', 'dar', 'anjambede', 'motaghayer', 'baraye', 'new', 'try', 'let', 'this', 'varna', 'case',
+                     'void', 'with', 'enum', 'tavaghti', 'bebor', 'catch', 'throw', 'const', 'yield',
                      'class', 'super', 'return', 'typeof', 'delete', 'switch', 'export', 'import',
-                     'default', 'finally', 'extends', 'function', 'continue', 'debugger', 'instanceof', 'pyimport'))
+                     'default', 'finally', 'extends', 'tabe', 'edame', 'debugger', 'instanceof', 'pyimport'))
 def isKeyword(w):
         # 'const' is specialized as Keyword in V8.
         # 'yield' and 'let' are for compatibility with SpiderMonkey and ES.next.

@@ -2,7 +2,7 @@ import pyjsparser
 import pyjsparser.parser
 
 # simple parsing
-assert pyjsparser.parse('var i;+9') == {'body': [{'kind': 'var', 'declarations': [{'init': None, 'type': u'VariableDeclarator', 'id': {'type': u'Identifier', 'name': u'i'}}], 'type': u'VariableDeclaration'}, {'type': u'ExpressionStatement', 'expression': {'operator': u'+', 'prefix': True, 'type': u'UnaryExpression', 'argument': {'raw': None, 'type': u'Literal', 'value': 9.0}}}], 'type': u'Program'}
+assert pyjsparser.parse('motaghayer i;+9') == {'body': [{'kind': 'motaghayer', 'declarations': [{'init': None, 'type': u'VariableDeclarator', 'id': {'type': u'Identifier', 'name': u'i'}}], 'type': u'VariableDeclaration'}, {'type': u'ExpressionStatement', 'expression': {'operator': u'+', 'prefix': True, 'type': u'UnaryExpression', 'argument': {'raw': None, 'type': u'Literal', 'value': 9.0}}}], 'type': u'Program'}
 
 # errors
 try:

@@ -1,4 +1,4 @@
-from .pyjsparserdata import *
+from .fsparserdata import *
 
 
 class BaseNode:
@@ -122,6 +122,7 @@ class BaseNode:
         self.type = Syntax.DoWhileStatement
         self.body = body
         self.test = test
+        self.finish()
         self.finish()
         return self
 
@@ -360,7 +361,7 @@ class BaseNode:
     def finishVariableDeclaration(self, declarations):
         self.type = Syntax.VariableDeclaration
         self.declarations = declarations
-        self.kind = 'var'
+        self.kind = 'motaghayer'
         self.finish()
         return self
 
@@ -450,6 +451,7 @@ class BaseNode:
 
     def __setitem__(self, key, value):
         setattr(self, key, value)
+
 
 class Node(BaseNode):
     pass
