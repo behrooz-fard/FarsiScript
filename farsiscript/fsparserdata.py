@@ -47,7 +47,7 @@ token = {
 TokenName = dict((v,k) for k,v in token.items())
 
 FnExprTokens = ['(', '{', '[', 'dar', 'typeof', 'instanceof', 'new',
-                    'return', 'case', 'delete', 'throw', 'void',
+                    'return', 'case', 'delete', 'partkon', 'void',
                     # assignment operators
                     '=', '+=', '-=', '*=', '/=', '%=', '<<=', '>>=', '>>>=',
                     '&=', '|=', '^=', ',',
@@ -282,10 +282,10 @@ def isRestrictedWord(w):
     return w in  ('eval', 'arguments')
 
 
-KEYWORDS = set(('agar', 'dar', 'anjambede', 'motaghayer', 'baraye', 'new', 'try', 'let', 'this', 'varna', 'case',
-                     'void', 'with', 'enum', 'tavaghti', 'bebor', 'catch', 'throw', 'const', 'yield',
+KEYWORDS = set(('agar', 'dar', 'anjambede', 'motaghayer', 'baraye', 'new', 'bekoosh', 'let', 'this', 'varna', 'case',
+                     'void', 'with', 'enum', 'tavaghti', 'bebor', 'begir', 'partkon', 'const', 'yield',
                      'class', 'super', 'return', 'typeof', 'delete', 'switch', 'export', 'import',
-                     'default', 'finally', 'extends', 'tabe', 'edame', 'debugger', 'instanceof', 'pyimport'))
+                     'default', 'darnahayat', 'extends', 'tabe', 'edame', 'debugger', 'instanceof', 'pyimport'))
 def isKeyword(w):
         # 'const' is specialized as Keyword in V8.
         # 'yield' and 'let' are for compatibility with SpiderMonkey and ES.next.

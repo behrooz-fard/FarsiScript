@@ -18,7 +18,7 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 #  OR THE USE OR OTHER DEALINGS IN THE SOFTWARE
 from __future__ import unicode_literals
-from .fsparserdata import *
+from .pyjsparserdata import *
 from .std_nodes import *
 from pprint import pprint
 import sys
@@ -2457,7 +2457,7 @@ class PyJsParser:
 
     def parseThrowStatement(self, node):
 
-        self.expectKeyword('throw');
+        self.expectKeyword('partkon');
 
         if (self.hasLineTerminator):
             self.throwError(Messages.NewlineAfterThrow);
@@ -2473,7 +2473,7 @@ class PyJsParser:
     def parseCatchClause(self):
         node = Node();
 
-        self.expectKeyword('catch');
+        self.expectKeyword('begir');
 
         self.expect('(');
         if (self.match(')')):
@@ -2492,14 +2492,14 @@ class PyJsParser:
         handler = null
         finalizer = null;
 
-        self.expectKeyword('try');
+        self.expectKeyword('bekoosh');
 
         block = self.parseBlock();
 
-        if (self.matchKeyword('catch')):
+        if (self.matchKeyword('begir')):
             handler = self.parseCatchClause()
 
-        if (self.matchKeyword('finally')):
+        if (self.matchKeyword('darnahayat')):
             self.lex();
             finalizer = self.parseBlock();
 
@@ -2556,9 +2556,9 @@ class PyJsParser:
                 return self.parseReturnStatement(node);
             elif val == 'switch':
                 return self.parseSwitchStatement(node);
-            elif val == 'throw':
+            elif val == 'partkon':
                 return self.parseThrowStatement(node);
-            elif val == 'try':
+            elif val == 'bekoosh':
                 return self.parseTryStatement(node);
             elif val == 'motaghayer':
                 return self.parseVariableStatement(node);
