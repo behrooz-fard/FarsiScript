@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='farsiscript',
-    version='0.0.3',
+    version='0.0.2',
     packages=['farsiscript'],
     url='https://github.com/behrooz-fard/pyjsparser',
     install_requires = [],
