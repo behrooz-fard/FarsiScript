@@ -1,6 +1,6 @@
 # farsiscript
 JavaScript parser dialected in Farsi. The goal is made javascript programming easy for iranian.
-This library is based on PyJsParser (https://github.com/Kronuz/esprima-python) parser by Kronuz
+This library is based on PyJsParser (https://github.com/PiotrDabkowski/pyjsparser) parser by PiotrDabkowski.
 
 
 # Installation 
