@@ -1,6 +1,6 @@
 # The MIT License
 #
-# Copyright 2014, 2015 Piotr Dabkowski
+# Copyright 2018, 2019 Behrooz Fard
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the 'Software'),
@@ -46,8 +46,8 @@ token = {
 
 TokenName = dict((v,k) for k,v in token.items())
 
-FnExprTokens = ['(', '{', '[', 'dar', 'typeof', 'instanceof', 'new',
-                    'return', 'case', 'delete', 'partkon', 'void',
+FnExprTokens = ['(', '{', '[', 'dar', 'typeof', 'instanceof', 'jadid',
+                    'bazgardan', 'mored', 'delete', 'partkon', 'void',
                     # assignment operators
                     '=', '+=', '-=', '*=', '/=', '%=', '<<=', '>>=', '>>>=',
                     '&=', '|=', '^=', ',',
@@ -282,10 +282,10 @@ def isRestrictedWord(w):
     return w in  ('eval', 'arguments')
 
 
-KEYWORDS = set(('agar', 'dar', 'anjambede', 'motaghayer', 'baraye', 'new', 'bekoosh', 'let', 'this', 'varna', 'case',
+KEYWORDS = set(('agar', 'dar', 'anjambede', 'motaghayer', 'baraye', 'jadid', 'bekoosh', 'let', 'this', 'varna', 'mored',
                      'void', 'with', 'enum', 'tavaghti', 'bebor', 'begir', 'partkon', 'const', 'yield',
-                     'class', 'super', 'return', 'typeof', 'delete', 'switch', 'export', 'import',
-                     'default', 'darnahayat', 'extends', 'tabe', 'edame', 'debugger', 'instanceof', 'pyimport'))
+                     'class', 'super', 'bazgardan', 'typeof', 'delete', 'bargozin', 'export', 'import',
+                     'pishfarz', 'darnahayat', 'extends', 'tabe', 'edame', 'eshkalzodaee', 'instanceof', 'pyimport'))
 def isKeyword(w):
         # 'const' is specialized as Keyword in V8.
         # 'yield' and 'let' are for compatibility with SpiderMonkey and ES.next.

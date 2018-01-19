@@ -1,6 +1,6 @@
 # The MIT License
 #
-# Copyright 2014, 2015 Piotr Dabkowski
+# Copyright 2018, 2019 Behrooz Fard
 #
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the 'Software'),
@@ -23,7 +23,7 @@ from .std_nodes import *
 from pprint import pprint
 import sys
 
-__all__ = ['PyJsParser', 'parse', 'ENABLE_JS2PY_ERRORS', 'ENABLE_PYIMPORT', 'JsSyntaxError']
+__all__ = ['FsParser', 'parse', 'ENABLE_JS2PY_ERRORS', 'ENABLE_PYIMPORT', 'JsSyntaxError']
 REGEXP_SPECIAL_SINGLE = ('\\', '^', '$', '*', '+', '?', '.', '[', ']', '(', ')', '{', '{', '|', '-')
 ENABLE_PYIMPORT = False
 ENABLE_JS2PY_ERRORS = False
@@ -48,7 +48,7 @@ false = False
 null = None
 
 
-class PyJsParser:
+class FsParser:
     """ Usage:
         parser = PyJsParser()
         parser.parse('var JavaScriptCode = 5.1')
@@ -1612,7 +1612,7 @@ class PyJsParser:
 
     def parseNewExpression(self):
         node = Node()
-        self.expectKeyword('new')
+        self.expectKeyword('jadid')
         callee = self.isolateCoverGrammar(self.parseLeftHandSideExpression)
         args = self.parseArguments() if self.match('(') else []
 
@@ -1634,7 +1634,7 @@ class PyJsParser:
                 self.throwUnexpectedToken(self.lookahead);
         else:
             expr = self.inheritCoverGrammar(
-                self.parseNewExpression if self.matchKeyword('new') else self.parsePrimaryExpression)
+                self.parseNewExpression if self.matchKeyword('jadid') else self.parsePrimaryExpression)
         while True:
             if (self.match('.')):
                 self.isBindingElement = false;
@@ -1673,7 +1673,7 @@ class PyJsParser:
                 self.throwUnexpectedToken(self.lookahead)
         else:
             expr = self.inheritCoverGrammar(
-                self.parseNewExpression if self.matchKeyword('new') else self.parsePrimaryExpression);
+                self.parseNewExpression if self.matchKeyword('jadid') else self.parsePrimaryExpression);
 
         while True:
             if (self.match('[')):
@@ -2353,7 +2353,7 @@ class PyJsParser:
     def parseReturnStatement(self, node):
         argument = null;
 
-        self.expectKeyword('return');
+        self.expectKeyword('bazgardan');
 
         if (not self.state['inFunctionBody']):
             self.tolerateError(Messages.IllegalReturn);
@@ -2399,17 +2399,17 @@ class PyJsParser:
         consequent = []
         node = Node();
 
-        if (self.matchKeyword('default')):
+        if (self.matchKeyword('pishfarz')):
             self.lex();
             test = null;
         else:
-            self.expectKeyword('case');
+            self.expectKeyword('mored');
             test = self.parseExpression();
 
         self.expect(':');
 
         while (self.startIndex < self.length):
-            if (self.match('}') or self.matchKeyword('default') or self.matchKeyword('case')):
+            if (self.match('}') or self.matchKeyword('pishfarz') or self.matchKeyword('mored')):
                 break
             statement = self.parseStatementListItem()
             consequent.append(statement)
@@ -2417,7 +2417,7 @@ class PyJsParser:
 
     def parseSwitchStatement(self, node):
 
-        self.expectKeyword('switch');
+        self.expectKeyword('bargozin');
 
         self.expect('(');
 
@@ -2511,7 +2511,7 @@ class PyJsParser:
     # 12.15 The debugger statement
 
     def parseDebuggerStatement(self, node):
-        self.expectKeyword('debugger');
+        self.expectKeyword('eshkalzodaee');
 
         self.consumeSemicolon();
 
@@ -2542,7 +2542,7 @@ class PyJsParser:
                 return self.parseBreakStatement(node);
             elif val == 'edame':
                 return self.parseContinueStatement(node);
-            elif val == 'debugger':
+            elif val == 'eshkalzodaee':
                 return self.parseDebuggerStatement(node);
             elif val == 'anjambede':
                 return self.parseDoWhileStatement(node);
@@ -2552,9 +2552,9 @@ class PyJsParser:
                 return self.parseFunctionDeclaration(node);
             elif val == 'agar':
                 return self.parseIfStatement(node);
-            elif val == 'return':
+            elif val == 'bazgardan':
                 return self.parseReturnStatement(node);
-            elif val == 'switch':
+            elif val == 'bargozin':
                 return self.parseSwitchStatement(node);
             elif val == 'partkon':
                 return self.parseThrowStatement(node);
@@ -2867,7 +2867,7 @@ class PyJsParser:
 def parse(javascript_code):
     """Returns syntax tree of javascript_code.
        Same as PyJsParser().parse  For your convenience :) """
-    p = PyJsParser()
+    p = FsParser()
     return p.parse(javascript_code)
 
 
@@ -2881,7 +2881,7 @@ if __name__ == '__main__':
         f.close()
     else:
         x = 'motaghayer $ = "Hello!"'
-    p = PyJsParser()
+    p = FsParser()
     t = time.time()
     res = p.parse(x)
     dt = time.time() - t + 0.000000001

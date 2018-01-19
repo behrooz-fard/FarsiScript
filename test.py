@@ -1,33 +1,33 @@
-import pyjsparser
-import pyjsparser.parser
+import farsiscript
+import farsiscript.parser
 
 # simple parsing
-assert pyjsparser.parse('motaghayer i;+9') == {'body': [{'kind': 'motaghayer', 'declarations': [{'init': None, 'type': u'VariableDeclarator', 'id': {'type': u'Identifier', 'name': u'i'}}], 'type': u'VariableDeclaration'}, {'type': u'ExpressionStatement', 'expression': {'operator': u'+', 'prefix': True, 'type': u'UnaryExpression', 'argument': {'raw': None, 'type': u'Literal', 'value': 9.0}}}], 'type': u'Program'}
+assert farsiscript.parse('motaghayer i;+9') == {'body': [{'kind': 'motaghayer', 'declarations': [{'init': None, 'type': u'VariableDeclarator', 'id': {'type': u'Identifier', 'name': u'i'}}], 'type': u'VariableDeclaration'}, {'type': u'ExpressionStatement', 'expression': {'operator': u'+', 'prefix': True, 'type': u'UnaryExpression', 'argument': {'raw': None, 'type': u'Literal', 'value': 9.0}}}], 'type': u'Program'}
 
 # errors
 try:
-    pyjsparser.parse('$ = ---')
-except pyjsparser.JsSyntaxError:
+    farsiscript.parse('$ = ---')
+except farsiscript.JsSyntaxError:
     pass
 except:
     raise Exception('Invalid error - should be JsSyntaxError')
 
-pyjsparser.parser.ENABLE_JS2PY_ERRORS = True
+farsiscript.parser.ENABLE_JS2PY_ERRORS = True
 try:
-    pyjsparser.parse('$ = ---')
-except pyjsparser.JsSyntaxError:
+    farsiscript.parse('$ = ---')
+except farsiscript.JsSyntaxError:
     raise Exception('Invalid error - should NOT be JsSyntaxError')
 except:
     pass
 
 
 # pyimport
-pyjsparser.parser.ENABLE_JS2PY_ERRORS = False
+farsiscript.parser.ENABLE_JS2PY_ERRORS = False
 try:
-    assert not pyjsparser.parse('pyimport abc')
-except pyjsparser.JsSyntaxError:
+    assert not farsiscript.parse('pyimport abc')
+except farsiscript.JsSyntaxError:
     pass
 
-pyjsparser.parser.ENABLE_PYIMPORT = True
-assert pyjsparser.parse('pyimport abc')
+farsiscript.parser.ENABLE_PYIMPORT = True
+assert farsiscript.parse('pyimport abc')
 
