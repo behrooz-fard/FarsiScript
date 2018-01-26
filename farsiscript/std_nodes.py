@@ -5,19 +5,19 @@ class BaseNode:
     def finish(self):
         pass
 
-    def finishArrayExpression(self, elements):
+    def finish_array_expression(self, elements):
         self.type = Syntax.ArrayExpression
         self.elements = elements
         self.finish()
         return self
 
-    def finishArrayPattern(self, elements):
+    def finish_array_pattern(self, elements):
         self.type = Syntax.ArrayPattern
         self.elements = elements
         self.finish()
         return self
 
-    def finishArrowFunctionExpression(self, params, defaults, body, expression):
+    def finish_arrow_function_expression(self, params, defaults, body, expression):
         self.type = Syntax.ArrowFunctionExpression
         self.id = None
         self.params = params
@@ -28,7 +28,7 @@ class BaseNode:
         self.finish()
         return self
 
-    def finishAssignmentExpression(self, operator, left, right):
+    def finish_assignment_expression(self, operator, left, right):
         self.type = Syntax.AssignmentExpression
         self.operator = operator
         self.left = left
@@ -36,14 +36,14 @@ class BaseNode:
         self.finish()
         return self
 
-    def finishAssignmentPattern(self, left, right):
+    def finish_assignment_pattern(self, left, right):
         self.type = Syntax.AssignmentPattern
         self.left = left
         self.right = right
         self.finish()
         return self
 
-    def finishBinaryExpression(self, operator, left, right):
+    def finish_binary_expression(self, operator, left, right):
         self.type = Syntax.LogicalExpression if (operator == '||' or operator == '&&') else Syntax.BinaryExpression
         self.operator = operator
         self.left = left
@@ -51,55 +51,55 @@ class BaseNode:
         self.finish()
         return self
 
-    def finishBlockStatement(self, body):
+    def finish_block_statement(self, body):
         self.type = Syntax.BlockStatement
         self.body = body
         self.finish()
         return self
 
-    def finishBreakStatement(self, label):
+    def finish_break_statement(self, label):
         self.type = Syntax.BreakStatement
         self.label = label
         self.finish()
         return self
 
-    def finishCallExpression(self, callee, args):
+    def finish_call_expression(self, callee, args):
         self.type = Syntax.CallExpression
         self.callee = callee
         self.arguments = args
         self.finish()
         return self
 
-    def finishCatchClause(self, param, body):
+    def finish_catch_clause(self, param, body):
         self.type = Syntax.CatchClause
         self.param = param
         self.body = body
         self.finish()
         return self
 
-    def finishClassBody(self, body):
+    def finish_class_body(self, body):
         self.type = Syntax.ClassBody
         self.body = body
         self.finish()
         return self
 
-    def finishClassDeclaration(self, id, superClass, body):
+    def finish_class_declaration(self, id, super_class, body):
         self.type = Syntax.ClassDeclaration
         self.id = id
-        self.superClass = superClass
+        self.superClass = super_class
         self.body = body
         self.finish()
         return self
 
-    def finishClassExpression(self, id, superClass, body):
+    def finish_class_expression(self, id, super_class, body):
         self.type = Syntax.ClassExpression
         self.id = id
-        self.superClass = superClass
+        self.superClass = super_class
         self.body = body
         self.finish()
         return self
 
-    def finishConditionalExpression(self, test, consequent, alternate):
+    def finish_conditional_expression(self, test, consequent, alternate):
         self.type = Syntax.ConditionalExpression
         self.test = test
         self.consequent = consequent
@@ -107,18 +107,18 @@ class BaseNode:
         self.finish()
         return self
 
-    def finishContinueStatement(self, label):
+    def finish_continue_statement(self, label):
         self.type = Syntax.ContinueStatement
         self.label = label
         self.finish()
         return self
 
-    def finishDebuggerStatement(self, ):
+    def finish_debugger_statement(self, ):
         self.type = Syntax.DebuggerStatement
         self.finish()
         return self
 
-    def finishDoWhileStatement(self, body, test):
+    def finish_do_while_statement(self, body, test):
         self.type = Syntax.DoWhileStatement
         self.body = body
         self.test = test
@@ -126,18 +126,18 @@ class BaseNode:
         self.finish()
         return self
 
-    def finishEmptyStatement(self, ):
+    def finish_empty_statement(self, ):
         self.type = Syntax.EmptyStatement
         self.finish()
         return self
 
-    def finishExpressionStatement(self, expression):
+    def finish_expression_statement(self, expression):
         self.type = Syntax.ExpressionStatement
         self.expression = expression
         self.finish()
         return self
 
-    def finishForStatement(self, init, test, update, body):
+    def finish_for_statement(self, init, test, update, body):
         self.type = Syntax.ForStatement
         self.init = init
         self.test = test
@@ -146,7 +146,7 @@ class BaseNode:
         self.finish()
         return self
 
-    def finishForInStatement(self, left, right, body):
+    def finish_for_in_statement(self, left, right, body):
         self.type = Syntax.ForInStatement
         self.left = left
         self.right = right
@@ -155,7 +155,7 @@ class BaseNode:
         self.finish()
         return self
 
-    def finishFunctionDeclaration(self, id, params, defaults, body):
+    def finish_function_declaration(self, id, params, defaults, body):
         self.type = Syntax.FunctionDeclaration
         self.id = id
         self.params = params
@@ -166,7 +166,7 @@ class BaseNode:
         self.finish()
         return self
 
-    def finishFunctionExpression(self, id, params, defaults, body):
+    def finish_function_expression(self, id, params, defaults, body):
         self.type = Syntax.FunctionExpression
         self.id = id
         self.params = params
@@ -177,13 +177,13 @@ class BaseNode:
         self.finish()
         return self
 
-    def finishIdentifier(self, name):
+    def finish_identifier(self, name):
         self.type = Syntax.Identifier
         self.name = name
         self.finish()
         return self
 
-    def finishIfStatement(self, test, consequent, alternate):
+    def finish_if_statement(self, test, consequent, alternate):
         self.type = Syntax.IfStatement
         self.test = test
         self.consequent = consequent
@@ -458,7 +458,7 @@ class Node(BaseNode):
 
 
 class WrappingNode(BaseNode):
-    def __init__(self, startToken=None):
+    def __init__(self):
         pass
 
 
